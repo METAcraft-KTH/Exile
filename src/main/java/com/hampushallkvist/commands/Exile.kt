@@ -1,5 +1,4 @@
-package com.hampushallkvist.metacraft.server.commands
-import com.hampushallkvist.commands.Command
+package com.hampushallkvist.commands
 import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.arguments.IntegerArgumentType
 import com.mojang.brigadier.arguments.StringArgumentType
