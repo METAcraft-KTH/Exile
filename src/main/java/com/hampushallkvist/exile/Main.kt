@@ -1,6 +1,6 @@
-package com.hampushallkvist.metacraft.server
+package com.hampushallkvist.exile
 
-import com.hampushallkvist.commands.CommandRegister
+import com.hampushallkvist.exile.commands.CommandRegister
 import com.hampushallkvist.metacraft.server.events.EventRegister
 import net.fabricmc.api.ModInitializer
 import org.apache.logging.log4j.LogManager
@@ -18,6 +18,6 @@ class Main : ModInitializer {
         CommandRegister().init()
         EventRegister().init()
 
-        LOGGER.info("Exile server mod initialized")
+        LOGGER.info("Exile server mod by Hampus Hallkvist initialized")
     }
 }

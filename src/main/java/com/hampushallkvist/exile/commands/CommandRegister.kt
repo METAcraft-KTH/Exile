@@ -1,4 +1,4 @@
-package com.hampushallkvist.commands
+package com.hampushallkvist.exile.commands
 
 import com.mojang.brigadier.CommandDispatcher
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback
@@ -10,7 +10,7 @@ interface Command {
 
 class CommandRegister {
     fun init() {
-
+        register(Exile())
     }
 
     private fun register(command: Command) {

@@ -1,4 +1,4 @@
-package com.hampushallkvist.commands
+package com.hampushallkvist.exile.commands
 import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.arguments.IntegerArgumentType
 import com.mojang.brigadier.arguments.StringArgumentType
