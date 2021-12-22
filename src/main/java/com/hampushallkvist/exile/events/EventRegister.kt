@@ -1,5 +1,6 @@
 package com.hampushallkvist.metacraft.server.events
 
+import com.hampushallkvist.exile.events.Exile
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents
 import net.minecraft.server.MinecraftServer
 

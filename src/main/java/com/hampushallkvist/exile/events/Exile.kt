@@ -1,5 +1,6 @@
-package com.hampushallkvist.metacraft.server.events
+package com.hampushallkvist.exile.events
 
+import com.hampushallkvist.metacraft.server.events.Event
 import net.minecraft.server.MinecraftServer
 import net.minecraft.text.LiteralText
 import net.minecraft.util.Formatting
