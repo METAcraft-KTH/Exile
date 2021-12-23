@@ -1,11 +1,16 @@
 package com.hampushallkvist.exile.commands
+import com.hampushallkvist.exile.events.ZoneNotifier
 import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.arguments.IntegerArgumentType
 import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
 import net.minecraft.command.CommandSource.suggestMatching
+import net.minecraft.command.DataCommandStorage
 import net.minecraft.command.argument.EntityArgumentType
+import net.minecraft.entity.player.PlayerEntity
+import net.minecraft.nbt.NbtCompound
+import net.minecraft.nbt.NbtElement
 import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
 import net.minecraft.text.LiteralText
@@ -15,6 +20,25 @@ import java.time.Instant
 import java.util.*
 
 class Exile : Command {
+
+    companion object {
+        /**
+         * This function accesses the NBT storage and saves the data properly
+         * if timestamp is -2 then the user is NOT exiled
+         * -1 means exiled until turned of
+         * all positive numbers describe timestamp until release
+         */
+        fun setPlayerExileStatus(storage: DataCommandStorage, player: PlayerEntity, timestamp: Long) {
+            val exiles = storage.get(Identifier("exile", "exiles"))
+
+            val compound = NbtCompound()
+            compound.putString("current_zone", ZoneNotifier.getPlayerZone(player).toString())
+            compound.putString("exiled_until", timestamp.toString())
+            exiles.put(player.entityName, compound)
+            storage.set(Identifier("exile", "exiles"), exiles)
+        }
+    }
+
     override fun register(dispatcher: CommandDispatcher<ServerCommandSource>, dedicated: Boolean) {
         val command: LiteralArgumentBuilder<ServerCommandSource> = CommandManager.literal("exile")
             .requires { source -> source.hasPermissionLevel(4) }
@@ -52,11 +76,8 @@ class Exile : Command {
     private fun exilePlayer(context: CommandContext<ServerCommandSource>): Int {
         val player = EntityArgumentType.getPlayer(context, "player")
 
-        val storage = context.source.server.dataCommandStorage
-        val exiles = storage.get(Identifier("exile", "exiles"))
+        setPlayerExileStatus(context.source.server.dataCommandStorage, player, -1)
 
-        exiles.putString(player.entityName, (-1L).toString())
-        storage.set(Identifier("exile", "exiles"), exiles)
         context.source.player.sendMessage(LiteralText("Player ${player.entityName} is now an exile").formatted(Formatting.GREEN), false)
         return 0
     }
@@ -92,13 +113,9 @@ class Exile : Command {
             return 0
         }
 
-        context.source.player.sendMessage(LiteralText("Player has been exiled until ${Date.from(Instant.ofEpochMilli(time.toLong()))}"), false)
+        context.source.player.sendMessage(LiteralText("Player has been exiled until ${Date.from(Instant.ofEpochMilli(time))}"), false)
 
-        val storage = context.source.server.dataCommandStorage
-        val exiles = storage.get(Identifier("exile", "exiles"))
-
-        exiles.putString(player.entityName, time.toString())
-        storage.set(Identifier("exile", "exiles"), exiles)
+        setPlayerExileStatus(context.source.server.dataCommandStorage, player, time)
         context.source.player.sendMessage(LiteralText("Player ${player.entityName} is now an exile").formatted(Formatting.GREEN), false)
         return 0
     }
