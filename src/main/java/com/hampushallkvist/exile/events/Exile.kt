@@ -28,12 +28,6 @@ class Exile : Event {
             val player = server.playerManager.getPlayer(it) ?: return
             val playerNBTCompound = exileNamespace.getCompound(player.entityName)
 
-            // If player doesn't exist then we insert it in storage
-            if (playerNBTCompound == null) {
-                manageUninitializedPlayer(server.dataCommandStorage, player, -2L)
-                hasChanged = true
-                return
-            }
             val exileTimestamp = playerNBTCompound.getString("exiled_until").toLong()
             if (exileTimestamp == -2L)
                 return

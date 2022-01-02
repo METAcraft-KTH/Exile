@@ -35,10 +35,16 @@ class ZoneNotifier : Event {
         val namespaceIdentifier = Identifier("exile", "exiles")
         val exileNamespace = server.dataCommandStorage.get(namespaceIdentifier)
 
-        val players = exileNamespace.keys
-        players.forEach {
-            val player = server.playerManager.getPlayer(it)
-            val currentZone = exileNamespace.getCompound(it).getString("current_zone")
+        // Runs for every online player on the server
+        server.playerManager.playerList.forEach {
+            val player = it
+
+            val playerNBTCompound = exileNamespace.getCompound(player.entityName)
+            // If player doesn't exist then we insert it in storage
+            if (!playerNBTCompound.contains("current_zone"))
+                Exile.manageUninitializedPlayer(server.dataCommandStorage, player, -2L)
+
+            val currentZone = playerNBTCompound.getString("current_zone")
             if (player != null && currentZone != null) {
                 // Check if we have a diff in state and actual position
                 if (player.pos.z < 0 && currentZone == Zone.CIVILIZATION.toString()) {

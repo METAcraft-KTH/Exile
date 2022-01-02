@@ -41,6 +41,10 @@ class Exile : Command {
 
     override fun register(dispatcher: CommandDispatcher<ServerCommandSource>, dedicated: Boolean) {
         val command: LiteralArgumentBuilder<ServerCommandSource> = CommandManager.literal("exile")
+            // List command
+            .then(CommandManager.literal("list")
+                .executes(this::listExiledPlayers))
+            // Sub-commands that require admin privileges
             .requires { source -> source.hasPermissionLevel(4) }
             // Add exile player
             .then(CommandManager.literal("set")
@@ -71,6 +75,32 @@ class Exile : Command {
                     .executes(this::removeExileFromPlayer)))
 
         dispatcher.register(command)
+    }
+
+    private fun listExiledPlayers(context: CommandContext<ServerCommandSource>): Int {
+
+        val player = context.source.player
+        player.sendMessage(LiteralText("==================== Exiled players ====================").formatted(Formatting.GOLD), false)
+
+        val namespaceIdentifier = Identifier("exile", "exiles")
+        val exileNamespace = context.source.server.dataCommandStorage.get(namespaceIdentifier)
+
+        exileNamespace.keys.forEach {
+            val exiledUntil = exileNamespace.getCompound(it).getString("exiled_until")
+
+            val message = LiteralText("$it ").formatted(Formatting.GOLD)
+
+            if (exiledUntil.equals("-2"))
+                return 0
+            else if (exiledUntil.equals("-1"))
+                message.append(LiteralText("until pardoned").formatted(Formatting.WHITE))
+            else
+                message.append(LiteralText("until ${Date(exiledUntil.toLong())}").formatted(Formatting.WHITE))
+
+            player.sendMessage(message, false)
+        }
+
+        return 0
     }
 
     private fun exilePlayer(context: CommandContext<ServerCommandSource>): Int {
