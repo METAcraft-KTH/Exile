@@ -7,6 +7,7 @@ import net.minecraft.server.MinecraftServer
 import net.minecraft.text.LiteralText
 import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
+import net.minecraft.world.World
 import java.lang.Math.abs
 
 class ZoneNotifier : Event {
@@ -46,6 +47,11 @@ class ZoneNotifier : Event {
 
             val currentZone = playerNBTCompound.getString("current_zone")
             if (player != null && currentZone != null) {
+                if (player.getWorld().getRegistryKey().equals(World.END)) {
+                    if (player.pos.x < 150 && player.pos.y > -150 && player.pos.z < 150 && player.pos.z > -150) {
+                        return;
+                    }
+                }
                 // Check if we have a diff in state and actual position
                 if (player.pos.z < 0 && currentZone == Zone.CIVILIZATION.toString()) {
                     updatePlayerZone(server.dataCommandStorage, player, Zone.WILDERNESS)
